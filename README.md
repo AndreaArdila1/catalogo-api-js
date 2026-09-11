@@ -14,15 +14,18 @@
 
 ## Descripción
 
-API RESTful para gestión de inventario y catálogo de productos, desarrollada con NestJS y Prisma ORM. Permite administrar productos, categorías y gestionar el ciclo de vida de pedidos en un entorno de e-commerce.
+API RESTful para gestión de inventario y catálogo de productos, desarrollada con NestJS y Prisma ORM. Permite administrar productos, categorías, usuarios y gestionar el ciclo de vida de pedidos en un entorno de e-commerce.
 
 ### Características principales
 
-- **Gestión de productos**: Crear, listar y consultar productos con precios, stock y categorías
-- **Sistema de categorías**: Organizar productos en categorías para una mejor estructura
-- **Modelo de pedidos**: Gestión completa de pedidos con estados (PENDIENTE, PAGADO, ENVIADO, ENTREGADO, CANCELADO)
+- **Gestión de productos**: CRUD completo con precios, stock y categorías
+- **Sistema de categorías**: CRUD completo para organizar productos
+- **Gestión de usuarios**: CRUD completo con validación de email único
+- **Modelo de pedidos**: Gestión completa con estados (PENDIENTE, PAGADO, ENVIADO, ENTREGADO, CANCELADO)
 - **Relaciones entre entidades**: Productos, categorías, usuarios y pedidos con relaciones definidas
-- **Base de datos PostgreSQL**: Persistencia robusta con Prisma ORM
+- **Swagger**: Documentación interactiva de la API disponible en `/docs`
+- **Validación**: DTOs con class-validator para garantizar integridad de datos
+- **Filtros de excepciones**: Manejo centralizado de errores de Prisma
 
 ## Stack tecnológico
 
@@ -32,26 +35,31 @@ API RESTful para gestión de inventario y catálogo de productos, desarrollada c
 | ORM | Prisma v7 |
 | Base de datos | PostgreSQL |
 | Lenguaje | TypeScript 5.7 |
+| Documentación API | Swagger v11 |
+| Validación | class-validator + class-transformer |
 | Testing | Jest 30 + Supertest |
 
 ## Estructura del proyecto
 
 ```
 src/
-├── prisma/           # Servicio global de Prisma
+├── prisma/           # Servicio global de Prisma + filtro de excepciones
 ├── productos/        # Módulo de productos (CRUD)
 ├── categorias/       # Módulo de categorías (CRUD)
+├── usuarios/         # Módulo de usuarios (CRUD)
 ├── app.module.ts     # Módulo raíz
-└── main.ts           # Punto de entrada
+├── app.controller.ts # Controlador raíz
+├── app.service.ts    # Servicio raíz
+└── main.ts           # Punto de entrada (Swagger, ValidationPipe)
 ```
 
 ### Modelo de datos
 
-- **Usuarios**: id, nombre, email, fecha de creación
-- **Categorías**: id, nombre, fecha de creación
-- **Productos**: id, nombre, descripción, precio, stock, categoría asociada
+- **Usuarios**: id, nombre, email (único), fecha de creación
+- **Categorías**: id, nombre (único), fecha de creación
+- **Productos**: id, nombre, descripción, precio (Decimal 12,2), stock, categoría asociada
 - **Pedidos**: id, estado (enum), total, usuario, fecha de creación
-- **Detalles de Pedido**: cantidad, precio unitario, pedido, producto
+- **Detalles de Pedido**: cantidad, precio unitario, pedido, producto (único por pedido)
 
 ## Configuración del proyecto
 
@@ -73,6 +81,9 @@ $ cp .env.example .env
 
 # Ejecutar migraciones de base de datos
 $ npx prisma migrate dev
+
+# Generar cliente Prisma
+$ npx prisma generate
 ```
 
 ### Variables de entorno
@@ -91,6 +102,16 @@ $ npm run start:dev
 
 # modo producción
 $ npm run start:prod
+```
+
+La API estará disponible en `http://localhost:3000`
+
+## Documentación Swagger
+
+Una vez ejecutado el proyecto, la documentación interactiva de la API está disponible en:
+
+```
+http://localhost:3000/docs
 ```
 
 ## Ejecutar tests
@@ -115,6 +136,8 @@ $ npm run test:cov
 | POST | `/productos` | Crear un nuevo producto |
 | GET | `/productos` | Obtener todos los productos |
 | GET | `/productos/:id` | Obtener un producto por ID |
+| PATCH | `/productos/:id` | Actualizar un producto |
+| DELETE | `/productos/:id` | Eliminar un producto |
 
 ### Categorías
 
@@ -122,6 +145,19 @@ $ npm run test:cov
 |--------|------|-------------|
 | POST | `/categorias` | Crear una nueva categoría |
 | GET | `/categorias` | Obtener todas las categorías |
+| GET | `/categorias/:id` | Obtener una categoría por ID |
+| PATCH | `/categorias/:id` | Actualizar una categoría |
+| DELETE | `/categorias/:id` | Eliminar una categoría |
+
+### Usuarios
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | `/usuarios` | Crear un nuevo usuario |
+| GET | `/usuarios` | Obtener todos los usuarios |
+| GET | `/usuarios/:id` | Obtener un usuario por ID |
+| PATCH | `/usuarios/:id` | Actualizar un usuario |
+| DELETE | `/usuarios/:id` | Eliminar un usuario |
 
 ## Desarrollo
 
@@ -136,6 +172,12 @@ $ npx prisma studio
 
 # Ver estructura de la base de datos
 $ npx prisma db pull
+
+# Formatear código
+$ npm run format
+
+# Lint
+$ npm run lint
 ```
 
 ### Documentación
@@ -143,6 +185,7 @@ $ npx prisma db pull
 - [Documentación de NestJS](https://docs.nestjs.com)
 - [Documentación de Prisma](https://www.prisma.io/docs)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Swagger](https://swagger.io/docs/)
 
 ## License
 
